@@ -1,0 +1,8 @@
+.elements__like {
+    height: 43px;
+    max-width: 23px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin-right: 20px;
+}

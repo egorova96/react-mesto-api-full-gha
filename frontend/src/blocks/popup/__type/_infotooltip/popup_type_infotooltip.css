@@ -1,0 +1,5 @@
+.popup_type_infotooltip {
+    z-index: 10;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+}

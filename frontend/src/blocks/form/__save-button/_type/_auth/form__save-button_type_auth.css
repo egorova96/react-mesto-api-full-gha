@@ -1,0 +1,15 @@
+.form__save-button_type_auth {
+    color: black;
+    background-color: white;
+    margin-top: 180px;
+    margin-bottom: 15px;
+    min-height: 50px;
+    font-size: 18px;
+}
+
+.form__save-button_type_auth:enabled{
+    color: black;
+    background-color: white;
+    margin-top: 180px;
+    margin-bottom: 15px;
+}

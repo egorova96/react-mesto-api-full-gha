@@ -1,0 +1,8 @@
+.popup__reg-link{
+    color: #FFFFFF;
+    text-decoration: none;
+    transition: opacity 0.7s;
+}
+.popup__reg-link:hover{
+    opacity: .7;
+}

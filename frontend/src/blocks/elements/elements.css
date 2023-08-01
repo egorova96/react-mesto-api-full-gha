@@ -1,0 +1,16 @@
+.elements {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 auto;
+    max-width: 880px;
+    justify-content: center;
+    gap: 17px;
+}
+
+@media screen and (max-width: 340px) {
+    .elements {
+        margin-left: 19px;
+        margin-right: 19px;
+        max-width: 282px;
+    }
+}

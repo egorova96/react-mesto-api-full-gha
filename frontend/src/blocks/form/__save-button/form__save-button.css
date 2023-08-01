@@ -1,0 +1,28 @@
+.form__save-button:enabled {
+    width: 358px;
+    height: 50px;
+    font-family: 'Inter', Arial, Helvetica, sans-serif;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 22px;
+    background-color: #000;
+    color: #fff;
+    cursor: pointer;
+    border-radius: 2px;
+    border: 0;
+    opacity: 1;
+}
+
+.form__save-button:hover:enabled {
+    opacity: 0.8;
+}
+
+
+@media screen and (max-width: 1050px) {
+    .form__save-button:enabled {
+        width: 238px;
+        height: 46px;
+        font-size: 14px;
+        line-height: 16px;
+    }
+}

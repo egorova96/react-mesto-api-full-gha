@@ -1,0 +1,13 @@
+.elements__pic {
+    max-width: 282px;
+    border-radius: 10px 10px 0 0;
+    width: 282px;
+    height: 282px;
+    position: relative;
+    cursor: pointer;
+    object-fit: cover;
+}
+
+.elements__pic:hover {
+    opacity: 0.8;
+}
