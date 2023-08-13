@@ -1,12 +1,14 @@
 import { Link } from "react-router-dom";
-import { useValidForm } from "../hooks/useValid";
+import { useForm } from "../hooks/useForm";
 
-function Register(props) {
-  const { isValid, values, handleChange } = useValidForm();
+function Register({ onRegister }) {
+  const { values, handleChange, errors, isValid, resetForm } = useForm();
 
   const handleSubmit = (evt) => {
     evt.preventDefault();
-    props.handleRegistration(values.email, values.password);
+    const { email, password } = values;
+    onRegister(email, password);
+    resetForm();
   };
 
   return (
@@ -33,7 +35,7 @@ function Register(props) {
             required
           />
 
-          <span className="form__input-error email-input-error"></span>
+          <span className="form__input-error email-input-error">{errors.email}</span>
 
           <input
             placeholder="Пароль"
@@ -47,7 +49,7 @@ function Register(props) {
             required
           />
 
-          <span className="form__input-error password-input-error"></span>
+          <span className="form__input-error password-input-error">{errors.password}</span>
 
           <button
             type="submit"

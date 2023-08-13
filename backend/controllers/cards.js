@@ -1,98 +1,102 @@
+/* eslint-disable no-shadow */
 /* eslint-disable implicit-arrow-linebreak */
 /* eslint-disable indent */
 /* eslint-disable camelcase */
 /* eslint-disable consistent-return */
 /* eslint-disable no-console */
-const card = require('../models/card');
+const Card = require('../models/card');
 const { OK } = require('../utils/constants');
 const ForbiddenError = require('../errors/ForbiddenError');
 const NotFoundError = require('../errors/NotFoundError');
-const BadRequestError = require('../errors/BadRequestError');
+const DocumentNotFoundError = require('../errors/DocumentNotFoundError');
 
 // const getAnswer = (res, data) => res.status(200).send(data);
+
+module.exports.getCards = (req, res, next) => {
+  Card.find({})
+    .then((cards) => res.send({ cards })).catch(next);
+};
 
 module.exports.createCard = (req, res, next) => {
   console.log(req.user._id);
   const { name, link } = req.body;
-  card.create({ name, link, owner: req.user._id })
-  .then((cardData) => res.status(OK).send({ data: cardData }))
+  Card.create({ name, link, owner: req.user._id })
+  .then((card) => res.status(OK).send(card))
     // eslint-disable-next-line consistent-return
     .catch((err) => {
-      if (err.name === 'BadRequestError') {
-        return next(new BadRequestError('Введены неверные данные'));
+      if (err.name === 'DocumentNotFoundError') {
+        next(new DocumentNotFoundError('Введены неверные данные'));
+      } else {
+      next(err);
       }
-      return next(err);
     });
-};
-
-module.exports.getAllCards = (req, res, next) => {
-  card.find({})
-    .then((cardsData) => res.send({ data: cardsData })).catch(next);
 };
 
 module.exports.deleteCard = (req, res, next) => {
-  card.findById(req.params.cardId)
-    .then((cardData) => {
-      if (!cardData) {
+  const { cardId } = req.params;
+  Card.findById(cardId)
+    .then((card) => {
+      if (!card) {
         throw new NotFoundError('Выбранного фото не существует');
       }
-      if (cardData.owner.toString() !== req.user._id) {
+      if (card.owner.toString() !== req.user._id) {
         throw new ForbiddenError('Недостаточно прав доступа');
       }
-    card.findByIdAndRemove(req.params.cardId).then((user) =>
-    res.status(OK).send({ data: user }))
-    .catch((err) => {
-      if (err.name === 'UserError') {
-        return next(new BadRequestError('Неверный Id пользователя'));
+      Card.findByIdAndRemove(cardId).then((card) => {
+      if (!card) {
+        throw new NotFoundError('Выбранного фото не существует');
       }
-      return next(err);
-    });
-  })
-  .catch(next);
+      res.status(OK).send(card);
+    })
+    .catch(next);
+})
+.catch((err) => {
+  if (err.name === 'CastError') {
+    return next(new DocumentNotFoundError('Неверный Id пользователя'));
+  }
+  return next(err);
+});
 };
 
 module.exports.likeCard = (req, res, next) => {
-  card.findById(req.params.cardId).then((cardData) => {
-    if (!cardData) {
+  const { cardId } = req.params;
+  const { _id } = req.user;
+  Card.findByIdAndUpdate(
+    cardId,
+      { $addToSet: { likes: _id } },
+      { new: true },
+    ).then((card) => {
+    if (!card) {
       throw new NotFoundError('Выбранного фото не существует');
     }
-  card.findByIdAndUpdate(
-    req.params.cardId,
-    { $addToSet: { likes: req.user._id } },
-    { new: true },
-  )
-    .then((newCardData) => {
-        res.status(OK).send({ data: newCardData });
-      })
-      .catch((err) => {
-      if (err.name === 'CardError') {
-        return next(new BadRequestError('Неверный Id пользователя'));
-      }
-      return next(err);
-    });
-    })
-    .catch(next);
+    res.status(OK).send(card);
+  }).catch((err) => {
+    if (err.name === 'CardError') {
+      return next(new DocumentNotFoundError('Неверный Id пользователя'));
+    }
+    return next(err);
+  });
 };
 
 module.exports.dislikeCard = (req, res, next) => {
-  card.findById(req.params.cardId).then((cardData) => {
-    if (!cardData) {
-      throw new NotFoundError('Выбранного фото не существует');
-    } return card
-    .findByIdAndUpdate(
-      req.params.cardId,
-    { $pull: { likes: req.user._id } },
+  const { cardId } = req.params;
+  const { _id } = req.user;
+  Card
+  .findByIdAndUpdate(
+    cardId,
+    { $pull: { likes: _id } },
     { new: true },
   )
-    .then((newCardData) => {
-        res.status(OK).send({ data: newCardData });
-      })
-    .catch((err) => {
-      if (err.name === 'CardError') {
-        return next(new BadRequestError('Неверный Id пользователя'));
-      }
-      return next(err);
-    });
+  .then((card) => {
+    if (!card) {
+      throw new NotFoundError('Выбранного фото не существует');
+    }
+    res.status(OK).send(card);
   })
-    .catch(next);
+  .catch((err) => {
+    if (err.name === 'CastError') {
+      return next(new DocumentNotFoundError('Неверный Id пользователя'));
+    }
+    return next(err);
+  });
 };

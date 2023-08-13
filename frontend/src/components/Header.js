@@ -3,19 +3,19 @@ import { Link } from "react-router-dom";
 import { Routes } from "react-router-dom";
 import { Route } from "react-router-dom";
 
-function Header({ email, logOut }) {
+function Header(props) {
   return (
     <header className="header">
       <img className="header__logo" src={logo} alt="лого" />
       <div className="header__navigation">
-        <p className="header__email">{email}</p>
+        <p className="header__email">{props.email}</p>
         <Routes>
           <Route
             path="/"
             element={
               <Link
                 className="header__nav-link header__nav-link_type_exit"
-                onClick={logOut}
+                onClick={props.onLogout}
                 to="/sign-in"
               >
                 Выйти

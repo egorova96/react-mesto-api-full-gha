@@ -1,45 +1,45 @@
+import React from 'react';
 import { CurrentUserContext } from "../contexts/CurrentUserContext";
-import { useContext } from "react";
 
-function Card(props) {
-  const currentUser = useContext(CurrentUserContext);
-  const isOwn = props.card.owner._id === currentUser._id;
-  const isLiked = props.card.likes.some((i) => i._id === currentUser._id);
+function Card({card, onCardClick, onCardLike, onCardDelete}) {
+  const currentUser = React.useContext(CurrentUserContext);
+  const isOwn = card.owner === currentUser._id;
+  const isLiked = card.likes.some(id => id === currentUser._id);
 
   function handleCardClick() {
-    props.onCardClick(props.card);
+    onCardClick(card);
   }
 
   function handleDeleteClick() {
-    props.onCardDelete(props.card);
+    onCardDelete(card);
   }
 
   function handleLikeClick() {
-    props.onCardLike(props.card);
+    onCardLike(card);
   }
 
-  const changeLikeColor = `elements__like-button ${
+  const likeColorClassName = (`elements__like-button ${
     isLiked && "elements__like-button_active"
-  }`;
+  }`);
 
   return (
     <div className="elements__item">
       <img
         className="elements__pic"
-        src={props.card.link}
-        alt={props.card.name}
+        src={`${card.link}`}
+        alt={`${card.name}`}
         onClick={handleCardClick}
       />
       <div className="elements__description">
-        <p className="elements__name">{props.card.name}</p>
+        <p className="elements__name">{`${card.name}`}</p>
         <div className="elements__like">
           <button
             type="button"
             onClick={handleLikeClick}
-            className={changeLikeColor}
+            className={likeColorClassName}
           ></button>
           <span className="elements__likes-counter">
-            {props.card.likes.length}
+            {`${card.likes.length}`}
           </span>
         </div>
       </div>

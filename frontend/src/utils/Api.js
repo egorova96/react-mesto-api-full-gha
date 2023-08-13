@@ -1,99 +1,123 @@
 class Api {
-    constructor({ mainUrl, headers }) {
-      this._mainUrl = mainUrl;
-      this._headers = headers;
-    }
-    _getAnswer(result) {
+  constructor({baseUrl}) {
+    this._baseUrl = baseUrl;
+  };
+    #getAnswer(result) {
       if (result.ok) {
         return result.json();
-      }
+      };
+  
       return Promise.reject(`Ошибка: ${result.status}`);
     }
-  
-    getInitialCards() {
-        return fetch(`${this._mainUrl}cards`, 
-        { method: 'GET',
-          headers: this._headers,
-         })
-         .then(this._getAnswer);
-    }
-     
-    setUserInfo() {
-      return fetch(`${this._mainUrl}users/me`, { 
+
+    getCards() {
+      const token = localStorage.getItem('token');
+      return fetch(`${this._baseUrl}cards`, {
         method: 'GET',
-        headers: this._headers,
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
       })
-      .then(this._getAnswer);
+      .then(this.#getAnswer);
+    };
+     
+    getUserInfo() {
+      const token = localStorage.getItem('token');
+      return fetch(`${this._baseUrl}users/me`, {
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      })
+      .then(this.#getAnswer);
     }
           
-    editProfile(data) {
-    return fetch(`${this._mainUrl}users/me`,{
+    editProfile({name, about}) {
+      const token = localStorage.getItem('token')
+    return fetch(`${this._baseUrl}users/me`,{
       method: 'PATCH',
-      headers: this._headers,
+      headers: {
+        authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+    },
       body: JSON.stringify({
-          name: data.name,
-          about: data.about
+          name: name,
+          about: about
       })
      })
-     .then(this._getAnswer)
+     .then(this.#getAnswer)
   }
           
     addCard(data) {
-        return fetch(`${this._mainUrl}cards`, {
-            method: "POST",
-            headers: this._headers,
-            body: JSON.stringify({
-                name: data.name,
-                link: data.link
-            }),
-        }).then(this._getAnswer);
+      const token = localStorage.getItem('token');
+      return fetch(`${this._baseUrl}cards`, {
+        method: 'POST',
+        headers: {
+          authorization: `Bearer ${token}`,
+          'Content-type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: data.name,
+          link: data.link,
+        }),
+      }).then(this.#getAnswer);
     }
 
-    editAvatar(data) {
-        return fetch(`${this._mainUrl}users/me/avatar`, {
-          method: "PATCH",
-          headers: this._headers,
-          body: JSON.stringify({
-            avatar: data.avatar,
-          }),
-        }).then(this._getAnswer);
+    editAvatar(avatar) {
+      const token = localStorage.getItem('token');
+      return fetch(`${this._baseUrl}users/me/avatar`, {
+        method: 'PATCH',
+        headers: {
+          authorization: `Bearer ${token}`,
+          'Content-type': 'application/json',
+        },
+        body: JSON.stringify({
+          avatar,
+        }),
+      }).then(this.#getAnswer);
       }
 
       deleteCard(cardId) {
-        return fetch(`${this._mainUrl}cards/${cardId}`, {
-          method: "DELETE",
-          headers: this._headers,
-        }).then(this._getAnswer);
+        const token = localStorage.getItem('token');
+        return fetch(`${this._baseUrl}cards/${cardId}`, {
+          method: 'DELETE',
+          headers: {
+            authorization: `Bearer ${token}`,
+          },
+        }).then(this.#getAnswer);
       }
     
       addLike(cardId) {
-        return fetch(`${this._mainUrl}cards/${cardId}/likes`, {
-          method: "PUT",
-          headers: this._headers,
-        }).then(this._getAnswer);
+        const token = localStorage.getItem('token');
+        return fetch(`${this._baseUrl}cards/${cardId}/likes`, {
+          method: 'PUT',
+          headers: {
+            authorization: `Bearer ${token}`,
+            'Content-type': 'application/json',
+          },
+        }).then(this.#getAnswer);
       }
     
       removeLike(cardId) {
-        return fetch(`${this._mainUrl}cards/${cardId}/likes`, {
-          method: "DELETE",
-          headers: this._headers,
-        }).then(this._getAnswer);
+        const token = localStorage.getItem('token');
+        return fetch(`${this._baseUrl}cards/${cardId}/likes`, {
+          method: 'DELETE',
+          headers: {
+            authorization: `Bearer ${token}`,
+            'Content-type': 'application/json',
+          },
+        }).then(this.#getAnswer);
       }
     
 
-        changeLikeCardStatus(cardId, isLiked) {
-          return isLiked ? this.removeLike(cardId) : this.addLike(cardId)
-    }
+      changeLikeCardStatus(cardId, isLiked) {
+        return isLiked ? this.removeLike(cardId) : this.addLike(cardId)
+      }
   }
 
-    const api = new Api({
-      mainUrl: "https://mesto.nomoreparties.co/v1/cohort-63/",
-      headers: {
-        authorization: "c8003cca-5572-430e-8e9c-250a3cfc2feb",
-        "Content-Type": "application/json",
-      },
-    });
-    
-    export default api
 
+export const api = new Api({
+  //baseUrl: "https://egorovaas96.nomoreparties.co/",
+  baseUrl: process.env.REACT_APP_API_BASE_URL
+});
     

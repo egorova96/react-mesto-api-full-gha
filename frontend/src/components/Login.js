@@ -1,13 +1,15 @@
 import { useForm } from "../hooks/useForm";
+import React from 'react';
 
-function Login(props) {
-  const { values, handleChange } = useForm({});
+function Login({ onLogin}) {
+  const { values, handleChange, errors, isValid, resetForm } = useForm({});
   const handleSubmit = (evt) => {
     evt.preventDefault();
     if (!values.email || !values.password) {
       return;
     }
-    props.handleLogin(values.email, values.password);
+    onLogin(values.email, values.password);
+    resetForm();
   };
 
   return (
@@ -23,7 +25,7 @@ function Login(props) {
         >
           <input
             placeholder="Email"
-            value={values.email}
+            value={values.email || ""}
             className="form__input form__input_type_email form__input_theme_black"
             name="email"
             id="email-input"
@@ -33,10 +35,10 @@ function Login(props) {
             maxLength="50"
             required
           />
-          <span className="form__input-error email-input-error"></span>
+          <span className="form__input-error email-input-error">{errors.email}</span>
           <input
             placeholder="Пароль"
-            value={values.password}
+            value={values.password || ""}
             className="form__input form__input_type_password form__input_theme_black"
             name="password"
             id="password-input"
@@ -45,10 +47,11 @@ function Login(props) {
             minLength="8"
             required
           />
-          <span className="form__input-error password-input-error"></span>
+          <span className="form__input-error password-input-error">{errors.password}</span>
           <button
             className="form__save-button form__save-button_type_auth "
             type="submit"
+            disabled={isValid?false:true}
           >
             Войти
           </button>

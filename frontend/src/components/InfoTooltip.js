@@ -2,7 +2,7 @@ import { usePopupClose } from "./usePopupClose";
 import sucsess from "../images/sucsess.png";
 import unsucsess from "../images/unsucsess.png";
 
-function InfoToolTip({ isOpen, onClose, isSuccess }) {
+function InfoToolTip({ isOpen, onClose, successful }) {
   usePopupClose(onClose, isOpen);
   return (
     <div
@@ -15,12 +15,12 @@ function InfoToolTip({ isOpen, onClose, isSuccess }) {
           onClick={onClose}
         />
         <img
-          src={isSuccess ? sucsess : unsucsess}
+          src={successful ? sucsess : unsucsess}
           className="popup__status-img"
-          alt={isSuccess ? "Регистрация успешна" : "Отказ в регистрации"}
+          alt={successful ? "Регистрация успешна" : "Отказ в регистрации"}
         />
         <h2 className="popup__title popup__title_type_infotooltip">
-          {isSuccess
+          {successful
             ? "Вы успешно зарегистрированы!"
             : "Что-то пошло не так! Попробуйте еще раз"}
         </h2>

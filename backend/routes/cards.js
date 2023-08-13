@@ -5,10 +5,10 @@ const { celebrate, Joi } = require('celebrate');
 const { regex } = require('../utils/constants');
 
 const {
-  getAllCards, createCard, likeCard, dislikeCard, deleteCard,
+  getCards, createCard, likeCard, dislikeCard, deleteCard,
 } = require('../controllers/cards');
 
-routerCard.get('/cards', getAllCards);
+routerCard.get('/cards', getCards);
 
 routerCard.post('/cards', celebrate({
   body: Joi.object().keys({
