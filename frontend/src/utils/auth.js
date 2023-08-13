@@ -1,5 +1,5 @@
-//export const main_url = 'https://backend.egorovaas96.nomoreparties.co';
-export const main_url = "http://localhost:3000"
+export const main_url = process.env.REACT_APP_API_BASE_URL;
+//export const main_url = "http://localhost:3000"
 export const checkAnswer = (res) => {
   if (res.ok) {
     return res.json();
@@ -8,7 +8,7 @@ export const checkAnswer = (res) => {
 }
 
 export const register = (email, password) => {
-  return fetch(`${main_url}/signup`, {
+  return fetch(`${main_url}signup`, {
     method: "POST",
     headers: {
       'Accept': "application/json",
@@ -19,7 +19,7 @@ export const register = (email, password) => {
 };
 
 export const authorize = (email, password) => {
-  return fetch(`${main_url}/signin`, {
+  return fetch(`${main_url}signin`, {
     method: "POST",
     headers: {
       'Accept': "application/json",
