@@ -1,4 +1,3 @@
-/* eslint-disable no-shadow */
 /* eslint-disable implicit-arrow-linebreak */
 /* eslint-disable indent */
 /* eslint-disable camelcase */
@@ -8,7 +7,7 @@ const Card = require('../models/card');
 const { OK } = require('../utils/constants');
 const ForbiddenError = require('../errors/ForbiddenError');
 const NotFoundError = require('../errors/NotFoundError');
-const DocumentNotFoundError = require('../errors/DocumentNotFoundError');
+const ValidationError = require('../errors/ValidationError');
 
 // const getAnswer = (res, data) => res.status(200).send(data);
 
@@ -24,8 +23,8 @@ module.exports.createCard = (req, res, next) => {
   .then((card) => res.status(OK).send(card))
     // eslint-disable-next-line consistent-return
     .catch((err) => {
-      if (err.name === 'DocumentNotFoundError') {
-        next(new DocumentNotFoundError('Введены неверные данные'));
+      if (err.name === 'ValidationError') {
+        next(new ValidationError('Введены неверные данные'));
       } else {
       next(err);
       }
@@ -42,17 +41,17 @@ module.exports.deleteCard = (req, res, next) => {
       if (card.owner.toString() !== req.user._id) {
         throw new ForbiddenError('Недостаточно прав доступа');
       }
-      Card.findByIdAndRemove(cardId).then((card) => {
+      Card.findByIdAndRemove(cardId).then((cardData) => {
       if (!card) {
-        throw new NotFoundError('Выбранного фото не существует');
+        throw new ValidationError('Выбранного фото не существует');
       }
-      res.status(OK).send(card);
+      res.status(OK).send(cardData);
     })
     .catch(next);
 })
 .catch((err) => {
   if (err.name === 'CastError') {
-    return next(new DocumentNotFoundError('Неверный Id пользователя'));
+    return next(new ValidationError('Неверный Id пользователя'));
   }
   return next(err);
 });
@@ -65,17 +64,9 @@ module.exports.likeCard = (req, res, next) => {
     cardId,
       { $addToSet: { likes: _id } },
       { new: true },
-    ).then((card) => {
-    if (!card) {
-      throw new NotFoundError('Выбранного фото не существует');
-    }
-    res.status(OK).send(card);
-  }).catch((err) => {
-    if (err.name === 'CardError') {
-      return next(new DocumentNotFoundError('Неверный Id пользователя'));
-    }
-    return next(err);
-  });
+    ).orFail(() => new NotFoundError('Такой карточки не существует'))
+    .then((newcard) => res.status(OK).send(newcard))
+    .catch(next);
 };
 
 module.exports.dislikeCard = (req, res, next) => {
@@ -95,7 +86,7 @@ module.exports.dislikeCard = (req, res, next) => {
   })
   .catch((err) => {
     if (err.name === 'CastError') {
-      return next(new DocumentNotFoundError('Неверный Id пользователя'));
+      return next(new ValidationError('Неверный Id пользователя'));
     }
     return next(err);
   });

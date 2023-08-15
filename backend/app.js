@@ -48,10 +48,6 @@ app.post('/signup', celebrate({
 }), createUser);
 app.use(auth);
 app.use(routers);
-const userRouters = require('./routes/users');
-app.use(userRouters);
-const cardRouters = require('./routes/cards');
-app.use(cardRouters);
 app.use(errorLogger);
 app.use(errors());
 app.use(errorHandler);

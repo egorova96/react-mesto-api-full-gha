@@ -1,4 +1,3 @@
-/* eslint-disable no-shadow */
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable indent */
 /* eslint-disable no-useless-return */
@@ -10,7 +9,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const { OK } = require('../utils/constants');
-const DocumentNotFoundError = require('../errors/DocumentNotFoundError');
+const ValidationError = require('../errors/ValidationError');
 const NotFoundError = require('../errors/NotFoundError');
 const ConflictError = require('../errors/ConflictError');
 
@@ -27,7 +26,7 @@ module.exports.login = (req, res, next) => {
 };
 
 module.exports.getUsers = (req, res, next) => {
-  User.find({}).then((users) => res.send({ users}))
+  User.find({}).then((users) => res.send({ users }))
     .catch(next);
 };
 
@@ -40,8 +39,8 @@ module.exports.getUserId = (req, res, next) => {
     res.send({ user });
   })
   .catch((err) => {
-    if (err.name === 'UserError') {
-      return next(new DocumentNotFoundError('Введены некорректные данные'));
+    if (err.name === 'CastError') {
+      return next(new ValidationError('Введены некорректные данные'));
     }
     return next(err);
   });
@@ -79,8 +78,8 @@ module.exports.createUser = (req, res, next) => {
       });
   })
   .catch((err) => {
-    if (err.name === 'DocumentNotFoundError') {
-      return next(new DocumentNotFoundError('Введены некорректные данные'));
+    if (err.name === 'ValidationError') {
+      return next(new ValidationError('Введены некорректные данные'));
     } if (err.code === 11000) {
       return next(new ConflictError('Указанный email уже существует'));
     }
@@ -92,18 +91,9 @@ module.exports.updateUserData = (req, res, next) => {
   const { name, about } = req.body;
   User
     .findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
-    .then((user) => {
-      if (!user) {
-        throw new NotFoundError('Запрашиваемый пользователь не найден');
-      }
-      res.send({ user });
-    })
-    .catch((err) => {
-      if (err.name === 'DocumentNotFoundError') {
-        return next(new DocumentNotFoundError('Введены некорректные данные'));
-      }
-      return next(err);
-    });
+    .orFail(() => NotFoundError('По данному `_id` пользователь не найден.'))
+    .then((user) => res.send(user))
+    .catch(next);
 };
 
 module.exports.updateAvatar = (req, res, next) => {
@@ -117,8 +107,8 @@ module.exports.updateAvatar = (req, res, next) => {
       res.send({ user });
     })
     .catch((err) => {
-      if (err.name === 'DocumentNotFoundError') {
-        return next(new DocumentNotFoundError('Введены некорректные данные'));
+      if (err.name === 'ValidationError') {
+        return next(new ValidationError('Введены некорректные данные'));
       }
       return next(err);
     });
