@@ -41,9 +41,9 @@ module.exports.deleteCard = (req, res, next) => {
       if (card.owner.toString() !== req.user._id) {
         throw new ForbiddenError('Недостаточно прав доступа');
       }
-      Card.findByIdAndRemove(cardId).then((cardData) => {
+      return Card.findByIdAndRemove(cardId).then((cardData) => {
       if (!card) {
-        throw new ValidationError('Выбранного фото не существует');
+        throw new NotFoundError('Выбранного фото не существует');
       }
       res.status(OK).send(cardData);
     })
